@@ -17,8 +17,8 @@ export function Envelope() {
       const r = el.getBoundingClientRect();
       const total = r.height - window.innerHeight;
       setEnter(clamp(1 - r.top / window.innerHeight));
-      // Latch the furthest progress so the reveal never replays on small scroll-backs.
-      setP((prev) => Math.max(prev, clamp(-r.top / (total || 1))));
+      // Read the current position in both directions; never latch the reveal.
+      setP(clamp(-r.top / (total || 1)));
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update);
@@ -33,15 +33,14 @@ export function Envelope() {
     };
   }, []);
 
-  const t = clamp(p / 0.28); // flap opening
+  const t = clamp(p / 0.3); // flap opening
   const flap = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; // ease-in-out hinge
-  const rise = clamp((p - 0.36) / 0.52); // letter emerges after a short pause
-  const c = 1.4; // easeOutBack → gentle settle
-  const ease = rise === 0 ? 0 : 1 + (c + 1) * Math.pow(rise - 1, 3) + c * Math.pow(rise - 1, 2);
-  const settle = Math.min(1, ease);
+  const rise = clamp((p - 0.22) / 0.78); // extraction overlaps the opening, without a pause
+  const ease = rise * rise * (3 - 2 * rise); // reversible easing without early overshoot
+  const settle = ease;
 
   return (
-    <section ref={ref} className="parchment relative h-[300svh]" aria-label="Invitation letter">
+    <section ref={ref} className="envelope-scroll parchment relative h-[300svh]" aria-label="Invitation letter">
       <div className="sticky top-0 flex h-svh flex-col items-center justify-center overflow-hidden px-4">
         <div className="absolute top-[6svh] text-center transition-opacity duration-500" style={{ opacity: Math.min(enter * 1.5, 1 - rise * 2) }}>
           <Heading>You’re Invited</Heading>
@@ -50,7 +49,7 @@ export function Envelope() {
 
         {/* Envelope stage */}
         <div
-          className="envelope relative aspect-[10/7] w-[min(86vw,400px)]"
+          className="envelope relative aspect-[10/7] w-[min(86vw,400px,42svh)]"
           style={{
             opacity: clamp(enter * 1.4),
             transform: `translateY(calc(${(1 - enter) * 60}px + ${settle * 34}svh)) scale(${0.94 + enter * 0.06 - settle * 0.04})`,
@@ -64,7 +63,7 @@ export function Envelope() {
             <article
               className="letter absolute inset-x-0 bottom-0 aspect-[10/16] rounded-sm px-[8%] py-[9%] text-center"
               style={{
-                transform: `translateY(${100 - ease * 132}%)`,
+                transform: `translateY(${100 - ease * 150}%)`,
                 boxShadow: `0 ${8 + settle * 16}px ${20 + settle * 24}px -12px oklch(0.3 0.08 30 / ${0.25 + settle * 0.25})`,
               }}
             >
