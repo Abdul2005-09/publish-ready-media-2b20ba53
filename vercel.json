@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/__l5e/assets-v1/:path*",
-      "destination": "https://id-preview--e0453ab0-1a6c-462a-a79e-1a0c9d0a42a1.lovable.app/__l5e/assets-v1/:path*"
+      "destination": "https://id-preview--9b0b6d6d-6262-49bf-af02-d94de729951e.lovable.app/__l5e/assets-v1/:path*"
     }
   ]
 }
