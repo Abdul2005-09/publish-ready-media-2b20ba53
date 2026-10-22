@@ -148,12 +148,11 @@
 
 /* Preserve desktop framing; phones show the complete uploaded video frame. */
 @media (width < 48rem) {
+  /* Tall portrait section; the full frame (any orientation) is letterboxed, never cropped. */
   .wedding-video {
-    height: auto;
+    height: 100svh;
     min-height: 0;
-    aspect-ratio: var(--video-aspect, 16 / 9);
-    max-height: 100svh;
-    background: var(--ink);
+    background: radial-gradient(ellipse at center, oklch(0.3 0.08 20), var(--ink) 75%);
   }
   .wedding-video video { object-fit: contain; }
 }
