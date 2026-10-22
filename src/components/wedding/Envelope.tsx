@@ -100,7 +100,7 @@ export function Envelope() {
           {/* Flap */}
           <div
             className="absolute inset-x-0 top-0 h-[62%] origin-top"
-            style={{ transform: `perspective(900px) rotateX(${flap * 180}deg)`, zIndex: flap > 0.5 ? 5 : 30 }}
+            style={{ transformStyle: "preserve-3d", transform: `perspective(900px) rotateX(${flap * 180}deg)`, zIndex: flap > 0.5 ? 5 : 30 }}
           >
             <div className="envelope-flap absolute inset-0" />
             <div className="envelope-flap-inner absolute inset-0" />
