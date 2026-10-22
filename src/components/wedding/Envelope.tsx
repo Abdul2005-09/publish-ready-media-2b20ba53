@@ -49,10 +49,10 @@ export function Envelope() {
 
         {/* Envelope stage */}
         <div
-          className="envelope relative aspect-[10/7] w-[min(86vw,400px,42svh)]"
+          className="envelope relative aspect-[10/7] w-[min(86vw,400px,52svh)]"
           style={{
             opacity: clamp(enter * 1.4),
-            transform: `translateY(calc(${(1 - enter) * 60}px + ${settle * 34}svh)) scale(${0.94 + enter * 0.06 - settle * 0.04})`,
+            transform: `translateY(calc(${(1 - enter) * 60}px + ${settle * 40}svh)) scale(${0.94 + enter * 0.06 - settle * 0.04})`,
             filter: `drop-shadow(0 ${12 + flap * 10}px ${18 + flap * 12}px oklch(0.3 0.08 30 / 0.3))`,
           }}
         >
