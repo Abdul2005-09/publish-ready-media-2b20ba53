@@ -148,13 +148,14 @@
 
 /* Preserve desktop framing; phones show the complete uploaded video frame. */
 @media (width < 48rem) {
-  /* Tall portrait section; the full frame (any orientation) is letterboxed, never cropped. */
+  /* Full-height portrait section. Phones load a prepared portrait encode (full landscape
+     frame centred over a softened fill of the same footage); cover only trims that fill. */
   .wedding-video {
     height: 100svh;
     min-height: 0;
     background: radial-gradient(ellipse at center, oklch(0.3 0.08 20), var(--ink) 75%);
   }
-  .wedding-video video { object-fit: contain; }
+  .wedding-video video { object-fit: cover; }
 }
 
 @media (width < 40rem) {
@@ -190,4 +191,10 @@
   outline: 1px solid color-mix(in oklch, var(--gold) 40%, transparent);
   outline-offset: -8px;
   box-shadow: var(--shadow-paper);
+}
+.envelope-flap-inner {
+  background: linear-gradient(0deg, oklch(0.88 0.04 80), oklch(0.82 0.05 76));
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform: rotateX(180deg);
+  backface-visibility: hidden;
 }

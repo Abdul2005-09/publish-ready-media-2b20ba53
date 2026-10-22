@@ -6,6 +6,7 @@ const clamp = (v: number) => Math.min(1, Math.max(0, v));
 export function Envelope() {
   const ref = useRef<HTMLElement>(null);
   const [p, setP] = useState(0);
+  const [enter, setEnter] = useState(0);
 
   useEffect(() => {
     let raf = 0;
@@ -15,7 +16,9 @@ export function Envelope() {
       if (!el) return;
       const r = el.getBoundingClientRect();
       const total = r.height - window.innerHeight;
-      setP(clamp(-r.top / (total || 1)));
+      setEnter(clamp(1 - r.top / window.innerHeight));
+      // Latch the furthest progress so the reveal never replays on small scroll-backs.
+      setP((prev) => Math.max(prev, clamp(-r.top / (total || 1))));
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update);
@@ -30,22 +33,29 @@ export function Envelope() {
     };
   }, []);
 
-  const flap = clamp(p / 0.25); // 0 → 1 flap opening
-  const rise = clamp((p - 0.25) / 0.6); // 0 → 1 letter sliding out
-  const ease = 1 - Math.pow(1 - rise, 3);
+  const t = clamp(p / 0.28); // flap opening
+  const flap = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; // ease-in-out hinge
+  const rise = clamp((p - 0.36) / 0.52); // letter emerges after a short pause
+  const c = 1.4; // easeOutBack → gentle settle
+  const ease = rise === 0 ? 0 : 1 + (c + 1) * Math.pow(rise - 1, 3) + c * Math.pow(rise - 1, 2);
+  const settle = Math.min(1, ease);
 
   return (
     <section ref={ref} className="parchment relative h-[300svh]" aria-label="Invitation letter">
       <div className="sticky top-0 flex h-svh flex-col items-center justify-center overflow-hidden px-4">
-        <div className="absolute top-[6svh] text-center transition-opacity duration-500" style={{ opacity: 1 - rise * 2 }}>
-          <Heading>A Letter For You</Heading>
+        <div className="absolute top-[6svh] text-center transition-opacity duration-500" style={{ opacity: Math.min(enter * 1.5, 1 - rise * 2) }}>
+          <Heading>You’re Invited</Heading>
           <Ornament />
         </div>
 
         {/* Envelope stage */}
         <div
           className="envelope relative aspect-[10/7] w-[min(86vw,400px)]"
-          style={{ transform: `translateY(${ease * 34}svh) scale(${1 - ease * 0.04})` }}
+          style={{
+            opacity: clamp(enter * 1.4),
+            transform: `translateY(calc(${(1 - enter) * 60}px + ${settle * 34}svh)) scale(${0.94 + enter * 0.06 - settle * 0.04})`,
+            filter: `drop-shadow(0 ${12 + flap * 10}px ${18 + flap * 12}px oklch(0.3 0.08 30 / 0.3))`,
+          }}
         >
           <div className="envelope-back absolute inset-0 rounded-md shadow-paper" />
 
@@ -53,7 +63,10 @@ export function Envelope() {
           <div className="absolute inset-x-[5%] bottom-[3%] top-[-260%] z-10 overflow-hidden">
             <article
               className="letter absolute inset-x-0 bottom-0 aspect-[10/16] rounded-sm px-[8%] py-[9%] text-center"
-              style={{ transform: `translateY(${100 - ease * 132}%)` }}
+              style={{
+                transform: `translateY(${100 - ease * 132}%)`,
+                boxShadow: `0 ${8 + settle * 16}px ${20 + settle * 24}px -12px oklch(0.3 0.08 30 / ${0.25 + settle * 0.25})`,
+              }}
             >
               <p className="font-display text-[0.6rem] tracking-[0.35em] text-gold sm:text-xs">✦ With Joy ✦</p>
               <h3 className="mt-2 font-script text-[2rem] leading-none text-primary sm:text-5xl">You Are Invited</h3>
@@ -87,9 +100,10 @@ export function Envelope() {
           {/* Flap */}
           <div
             className="absolute inset-x-0 top-0 h-[62%] origin-top"
-            style={{ transform: `perspective(900px) rotateX(${flap * 180}deg)`, zIndex: flap > 0.5 ? 5 : 30 }}
+            style={{ transformStyle: "preserve-3d", transform: `perspective(900px) rotateX(${flap * 180}deg)`, zIndex: flap > 0.5 ? 5 : 30 }}
           >
             <div className="envelope-flap absolute inset-0" />
+            <div className="envelope-flap-inner absolute inset-0" />
             <div
               className="absolute left-1/2 top-full flex size-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-primary font-script text-xl text-primary-foreground shadow-paper ring-2 ring-gold sm:size-14"
               style={{ opacity: 1 - flap * 2 }}

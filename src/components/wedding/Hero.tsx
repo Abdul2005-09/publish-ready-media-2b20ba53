@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 import video from "@/assets/wedding-video.mp4.asset.json";
+import portrait from "@/assets/wedding-video-portrait.mp4.asset.json";
+import portraitPoster from "@/assets/wedding-video-poster-portrait.jpg.asset.json";
 import poster from "@/assets/wedding-video-poster.jpg.asset.json";
 
 export function Hero({ active }: { active: boolean }) {
@@ -7,6 +9,7 @@ export function Hero({ active }: { active: boolean }) {
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
+    if (matchMedia("(max-width: 47.99rem)").matches) v.poster = portraitPoster.url;
     if (!active) {
       v.pause();
       return;
@@ -48,6 +51,7 @@ export function Hero({ active }: { active: boolean }) {
         controls={false}
         aria-hidden
       >
+        <source src={portrait.url} type="video/mp4" media="(max-width: 47.99rem)" />
         <source src={video.url} type="video/mp4" />
       </video>
     </section>
