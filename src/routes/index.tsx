@@ -1,24 +1,50 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Cover } from "@/components/wedding/Cover";
+import { Hero } from "@/components/wedding/Hero";
+import { Envelope } from "@/components/wedding/Envelope";
+import { Dates } from "@/components/wedding/Dates";
+import { Closing, Countdown, Gallery, Story, Venue } from "@/components/wedding/Sections";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Dhyaani Weds Vinotha — Wedding Invitation" },
+      { name: "description", content: "Join us for the wedding of Dhyaani & Vinotha at The Royal Mahal, Vayalur, Trichy — 21 & 22 November 2026." },
+      { property: "og:title", content: "Dhyaani Weds Vinotha" },
+      { property: "og:description", content: "Reception 21 Nov · Muhurtham 22 Nov 2026 at The Royal Mahal, Trichy." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
+  const [opened, setOpened] = useState(false);
+  const [coverGone, setCoverGone] = useState(false);
+  const [datesRevealed, setDatesRevealed] = useState(false);
+
+  const open = () => {
+    setOpened(true);
+    setTimeout(() => setCoverGone(true), 2600);
+  };
+
+  useEffect(() => {
+    document.body.style.overflow = coverGone ? "" : "hidden";
+  }, [coverGone]);
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <main className="relative">
+      {!coverGone && <Cover onOpen={open} />}
+      <Hero active={opened} />
+      <Dates onRevealed={() => setDatesRevealed(true)} />
+      {datesRevealed && <Countdown />}
+      <Envelope />
+      <Story />
+      <Venue />
+      <Gallery />
+      <Closing />
+    </main>
   );
 }
