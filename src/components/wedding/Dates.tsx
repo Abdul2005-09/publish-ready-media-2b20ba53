@@ -36,7 +36,7 @@ function ScratchCard({ title, day, time, onReveal }: { title: string; day: strin
     ctx.fillStyle = "#5a1a22";
     ctx.font = "600 15px Cinzel, serif";
     ctx.textAlign = "center";
-    ctx.fillText("✦ SCRATCH TO REVEAL ✦", rect.width / 2, rect.height / 2 + 5);
+    ctx.fillText("Scratch. Reveal. Celebrate!", rect.width / 2, rect.height / 2 + 5);
   }, []);
 
   const scratch = (x: number, y: number) => {
